@@ -5,7 +5,7 @@ from ray import Ray
 from pygame import Vector2, Surface, draw, Color
 import colors
 
-class Bound(ABC):
+class Obstacle(ABC):
     def __init__(self, color: Color = colors.BLACK) -> None:
         self.color = color
     
@@ -18,7 +18,7 @@ class Bound(ABC):
         pass
 
 
-class LineBound(Bound):
+class LineObstacle(Obstacle):
     def __init__(self, p1: Vector2, p2: Vector2) -> None:
         super().__init__()
         self.p1 = Vector2(p1)

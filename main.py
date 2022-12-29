@@ -6,7 +6,7 @@ import pygame
 from random import random
 
 from ray import Ray
-from bound import LineBound
+from bound import LineObstacle
 
 import colors
 
@@ -20,7 +20,7 @@ class Main(App):
             colors.RED
         )
         self.bounds = [
-            LineBound(
+            LineObstacle(
                 Vector2(random() * self.width, random() * self.height),
                 Vector2(random() * self.width, random() * self.height),
             )
@@ -31,7 +31,6 @@ class Main(App):
         mouse = Vector2(pygame.mouse.get_pos())
         self.ray.look_at(mouse)
         [bound.interact(self.ray) for bound in self.bounds]
-        pass
     
     def draw(self):
         self.surface.fill(colors.WHITE)
