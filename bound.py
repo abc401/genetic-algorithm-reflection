@@ -13,6 +13,10 @@ class Bound(ABC):
     def collide(self, ray: Ray) -> Vector2 | None:
         pass
 
+    @abstractmethod
+    def interact(self, ray: Ray) -> Ray | None:
+        pass
+
 
 class LineBound(Bound):
     def __init__(self, p1: Vector2, p2: Vector2) -> None:
@@ -33,6 +37,13 @@ class LineBound(Bound):
         u = ((x1 - x3)*(y1 - y2) - (y1 - y3)*(x1 - x2)) / denomenator
         if t >= 0 and 0 <= u <= 1:
             return Vector2(x1 + t * (x2 - x1), y1 + t * (y2 - y1))
+    
+    def interact(self, ray: Ray) -> Ray | None:
+        collide_point = self.collide(ray)
+        if not collide_point:
+            return
+        if collide_point.magnitude() < ray.collide_point.magnitude():
+            ray.collide_point = collide_point
     
     def draw(self, surface: Surface):
         draw.line(surface, self.color, self.p1, self.p2)
