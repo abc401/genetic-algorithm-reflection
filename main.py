@@ -6,7 +6,7 @@ import pygame
 from random import random
 
 from ray import Ray
-from bound import LineObstacle
+from obstacles import ReflectorObstacle
 
 import colors
 
@@ -19,23 +19,34 @@ class Main(App):
             Vector2(1, 1),
             colors.RED
         )
-        self.bounds = [
-            LineObstacle(
-                Vector2(random() * self.width, random() * self.height),
-                Vector2(random() * self.width, random() * self.height),
-            )
-            for i in range(5)
-        ]
+        self.interactable = ReflectorObstacle(
+            [
+                Vector2(100, 100), 
+                Vector2(150, 200),
+                Vector2(300, 150)
+            ], 
+            view_normals=True
+        )
+        # self.bounds = [
+        #     LineObstacle(
+        #         Vector2(random() * self.width, random() * self.height),
+        #         Vector2(random() * self.width, random() * self.height),
+        #     )
+        #     for i in range(5)
+        # ]
 
     def update(self, dt):
+        pass
         mouse = Vector2(pygame.mouse.get_pos())
-        self.ray.look_at(mouse)
-        [bound.interact(self.ray) for bound in self.bounds]
+        # self.ray.look_at(mouse)
+        self.interactable.vertices[1] = mouse
+        # [bound.interact(self.ray) for bound in self.bounds]
     
     def draw(self):
         self.surface.fill(colors.WHITE)
-        self.ray.draw(self.surface)
-        [bound.draw(self.surface) for bound in self.bounds]
+        # self.ray.draw(self.surface)
+        # [bound.draw(self.surface) for bound in self.bounds]
+        self.interactable.draw(self.surface)
 
     def event_handler(self, event: Event):
         pass
