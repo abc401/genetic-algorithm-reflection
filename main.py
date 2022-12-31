@@ -6,7 +6,7 @@ import pygame
 from random import random
 
 from ray import Ray
-from obstacles import ReflectorObstacle
+from interactables import ReflectorObstacle
 
 import colors
 
@@ -47,6 +47,9 @@ class Main(App):
         # self.ray.draw(self.surface)
         # [bound.draw(self.surface) for bound in self.bounds]
         self.interactable.draw(self.surface)
+        end = Vector2()
+        end.from_polar((90, 45))
+        draw.line(self.surface, colors.BLACK, Vector2(), end)
 
     def event_handler(self, event: Event):
         pass

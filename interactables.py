@@ -4,7 +4,7 @@ from ray import Ray
 
 from pygame import Vector2, Surface, draw, Color
 import colors
-from math import inf, radians
+from math import inf
 
 class Interactable(ABC):
     def __init__(
@@ -17,11 +17,11 @@ class Interactable(ABC):
         self.color = color
         self.view_normals = view_normals
     
-    def collide(self, p1_index: int, p2_index: int, ray: Ray) -> Vector2 | None:
+    def collide_with_segment(self, seg_index: int, ray: Ray) -> Vector2 | None:
         x1, y1 = ray.pos.xy
         x2, y2 = (ray.pos + ray.theta).xy
-        x3, y3 = self.vertices[p1_index].xy
-        x4, y4 = self.vertices[p2_index].xy
+        x3, y3 = self.vertices[seg_index].xy
+        x4, y4 = self.vertices[seg_index+1].xy
 
         denomenator = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4)
         if denomenator == 0:
@@ -32,13 +32,20 @@ class Interactable(ABC):
             return Vector2(x1 + t * (x2 - x1), y1 + t * (y2 - y1))
         return Vector2(inf, inf)
 
-    def normal(self, p1_index: int, p2_index: int) -> Vector2:
-        p1, p2 = self.vertices[p1_index], self.vertices[p2_index]
-        return (p2 - p1).normalize().rotate(90)
-        denomenator = (p2.y - p1.y)
-        if denomenator:
-            normal_slope = -(p2.x - p1.x)/denomenator
-        return Vector2(1, normal_slope).normalize()
+    def collide(self, ray: Ray):
+        seg_index = 0
+        collide_point = Vector2(inf, inf)
+        for i in range(len(self.vertices)-1):
+            tmp = self.collide_with_segment(i, ray)
+            if tmp.magnitude() < collide_point.magnitude():
+                collide_point = tmp
+                seg_index = i
+        if collide_point.magnitude() < ray.collide_point.magnitude():
+            ray.collide_point = collide_point
+        return collide_point, seg_index
+
+    def get_normal(self, seg_index: int) -> Vector2:
+        return (self.vertices[seg_index] - self.vertices[seg_index+1]).normalize().rotate(90)
 
     @abstractmethod
     def interact(self, ray: Ray) -> Ray | None:
@@ -53,7 +60,7 @@ class Interactable(ABC):
                 draw.line(
                     surface, colors.BLUE,
                     start,
-                    start + self.normal(i, i+1)*10
+                    start + self.get_normal(i)*10
                 )
 
 class ReflectorObstacle(Interactable):
@@ -65,14 +72,16 @@ class ReflectorObstacle(Interactable):
     ) -> None:
         super().__init__(vertices, color, closed, view_normals)
 
-    def interact(self, ray: Ray) -> Ray:
-        collide_point = Vector2(inf, inf)
-        for i in range(len(self.vertices)-1):
-            tmp = self.collide(i, i+1, ray)
-            if tmp.magnitude() < collide_point.magnitude():
-                collide_point = tmp
-        if collide_point.magnitude() < ray.collide_point.magnitude():
-            ray.collide_point = collide_point
+    def interact(self, ray: Ray, seg_index: int) -> Ray:
+        return self.reflect(ray, seg_index)
+    
+    def reflect(self, ray: Ray, seg_index: int):
+        normal = self.get_normal(seg_index)
+        theta = ray.theta.angle_to(normal)
+        reflected = Vector2()
+        reflected.from_polar((1, theta))
+        return reflected
+
         
 
 
