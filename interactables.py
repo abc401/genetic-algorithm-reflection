@@ -4,7 +4,7 @@ from ray import Ray
 
 from pygame import Vector2, Surface, draw, Color
 import colors
-from math import inf
+from math import inf, isinf
 
 class Interactable(ABC):
     def __init__(
@@ -72,15 +72,21 @@ class ReflectorObstacle(Interactable):
     ) -> None:
         super().__init__(vertices, color, closed, view_normals)
 
-    def interact(self, ray: Ray, seg_index: int) -> Ray:
-        return self.reflect(ray, seg_index)
+    def interact(self, ray: Ray) -> Ray:
+        collide_point, seg_index = self.collide(ray)
+        if not isinf(collide_point.magnitude()):
+            reflect_theta = self.reflect(ray, seg_index)
+            return Ray(collide_point+reflect_theta, reflect_theta)
+
     
-    def reflect(self, ray: Ray, seg_index: int):
+    def reflect(self, ray: Ray, seg_index: int) -> Vector2:
         normal = self.get_normal(seg_index)
-        theta = ray.theta.angle_to(normal)
-        reflected = Vector2()
-        reflected.from_polar((1, theta))
-        return reflected
+
+        reflected = -ray.theta
+        theta = reflected.angle_to(normal)
+        # print(theta)
+        # print(normal_theta + theta)
+        return reflected.rotate(2 * theta)
 
         
 
