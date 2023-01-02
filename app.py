@@ -39,8 +39,8 @@ class App(ABC):
         while(self.running):
             self.draw()
             pygame.display.update()
-            
             self.update(self.dt)
+            
             
             for event in pygame.event.get():
                 self.event_handler(event)
