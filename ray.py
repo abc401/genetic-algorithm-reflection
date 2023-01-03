@@ -24,18 +24,16 @@ class Ray:
         try:
             self.theta = new_theta.normalize()
         except ValueError:
-            self.theta = new_theta
+            self.theta = Vector2()
         self.collide_point = Vector2(inf, inf)
     
     def set_collide_point(self, collide_point: Vector2):
         prev_mag = (self.collide_point - self.pos).magnitude()
         curr_mag = (collide_point - self.pos).magnitude()
-        if curr_mag < prev_mag:
+        if curr_mag <= prev_mag:
             # print(f'prev {prev_mag}, curr {curr_mag}')
             self.collide_point = collide_point
-            print(f'curr < prev')
             return True
-        print(f'curr > prev')
         return False
 
     # def score(self, target: Target):
@@ -48,7 +46,7 @@ class Ray:
             pass
         if self.debug:
             if self.theta.x == 0 and self.theta.y == 0:
-                draw.circle(surface, self.color, self.pos, 10)
+                draw.circle(surface, self.color, self.pos, 5)
             else:
                 draw.line(surface, self.color, self.pos, self.pos + 10 * self.theta)
                 

@@ -30,7 +30,17 @@ class Main(App):
                         Vector2(350, 250),
                         Vector2(350, 350),
                         Vector2(250, 350)
-                    ]
+                    ],
+                    closed=True
+                ),
+                Absorber(
+                    [
+                        Vector2(0, -1),
+                        Vector2(self.width, -1),
+                        Vector2(self.width, self.height),
+                        Vector2(0, self.height)
+                    ],
+                    closed=True
                 )
             ],
             []

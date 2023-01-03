@@ -23,7 +23,7 @@ class Interactable(ABC):
         x1, y1 = ray.pos.xy
         x2, y2 = (ray.pos + ray.theta).xy
         x3, y3 = self.vertices[seg_index].xy
-        x4, y4 = self.vertices[seg_index+1].xy
+        x4, y4 = self.vertices[(seg_index+1)%len(self.vertices)].xy
 
         denomenator = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4)
         if denomenator == 0:
@@ -37,7 +37,8 @@ class Interactable(ABC):
     def collide(self, ray: Ray) -> tuple[Vector2, int]:
         seg_index = 0
         collide_point = Vector2(inf, inf)
-        for i in range(len(self.vertices)-1):
+        n_segments = len(self.vertices) if self.closed else len(self.vertices) - 1
+        for i in range(n_segments):
             tmp = self.collide_with_segment(i, ray)
             if tmp.magnitude() < collide_point.magnitude():
                 collide_point = tmp
@@ -46,7 +47,7 @@ class Interactable(ABC):
         return collide_point, seg_index
 
     def get_normal(self, seg_index: int) -> Vector2:
-        return (self.vertices[seg_index] - self.vertices[seg_index+1]).normalize().rotate(90)
+        return (self.vertices[seg_index] - self.vertices[(seg_index+1)%len(self.vertices)]).normalize().rotate(90)
 
     def can_interact_with(self, ray: Ray) -> tuple[bool, Vector2, int]:
         collide_point, seg_index = self.collide(ray)
@@ -96,7 +97,7 @@ class Reflector(Interactable):
         reflected = -ray.theta
         theta = reflected.angle_to(normal)
         reflected = reflected.rotate(2 * theta)
-        ray.update(collide_point+reflected, reflected)
+        ray.update(collide_point+reflected*0.00000001, reflected)
 
 
 class Absorber(Interactable):
@@ -109,7 +110,8 @@ class Absorber(Interactable):
 
     def interact_with_segment(self, ray: Ray, seg_index: int):
         collide_point = self.collide_with_segment(seg_index, ray)
-        ray.update(collide_point)
+        if not isinf(collide_point.magnitude()):
+            ray.update(collide_point)
 
 
 
