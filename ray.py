@@ -21,16 +21,21 @@ class Ray:
     def update(self, new_pos: Vector2, new_theta: Vector2 = Vector2()):
         self.pos = new_pos
         self.prev_positions.append(self.pos)
-        self.theta = new_theta.normalize()
+        try:
+            self.theta = new_theta.normalize()
+        except ValueError:
+            self.theta = new_theta
         self.collide_point = Vector2(inf, inf)
     
     def set_collide_point(self, collide_point: Vector2):
         prev_mag = (self.collide_point - self.pos).magnitude()
         curr_mag = (collide_point - self.pos).magnitude()
-        print(f'prev {prev_mag}, curr {curr_mag}')
-        if (collide_point - self.pos).magnitude() < (self.collide_point - self.pos).magnitude():
+        if curr_mag < prev_mag:
+            # print(f'prev {prev_mag}, curr {curr_mag}')
             self.collide_point = collide_point
+            print(f'curr < prev')
             return True
+        print(f'curr > prev')
         return False
 
     # def score(self, target: Target):

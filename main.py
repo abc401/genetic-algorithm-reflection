@@ -50,8 +50,8 @@ class Main(App):
 
     def draw(self):
         self.surface.fill(colors.WHITE)
-        self.ray.draw(self.surface)
         self.level.draw(self.surface)
+        self.ray.draw(self.surface)
 
     def event_handler(self, event: Event):
         pass

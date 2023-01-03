@@ -19,13 +19,13 @@ class Level:
                 if not can_interact:
                     # print(f'cannot interact {i}')
                     continue
-                # TODO: Fix bug with set_collide_point
-                if ray.set_collide_point(collide_point):
-                    print(f'set collide {i}')
-                    min_obstacle_index = i
-                    min_seg_index = seg_index
+                print(f'can interact {can_interact}, {i}, seg {seg_index}')
+                print(f'set collide {i}')
+                min_obstacle_index = i
+                min_seg_index = seg_index
              
             if min_obstacle_index is None:
+                print(f'min_obstacle None')
                 break
 
             self.interactables[min_obstacle_index].interact_with_segment(ray, min_seg_index)
