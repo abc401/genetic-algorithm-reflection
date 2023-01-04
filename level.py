@@ -4,11 +4,11 @@ from pygame import Surface
 
 
 class Level:
-    def __init__(self, obstacles: list[Interactable], targets: list[Interactable]) -> None:
+    def __init__(self, obstacles: list[Interactable]) -> None:
         self.obstacles = obstacles
-        self.targets = targets
-        self.interactables = self.obstacles + self.targets
+        self.interactables = self.obstacles
         self.max_interactions = 30
+        self.reached_target = 0
     
     def evaluate(self, ray: Ray):
         for _ in range(self.max_interactions):
@@ -26,8 +26,12 @@ class Level:
             self.interactables[min_obstacle_index].interact_with_segment(ray, min_seg_index)
             # print(min_obstacle_index)
 
-            if self.interactables[min_obstacle_index] in self.targets:
+            if self.interactables[min_obstacle_index].is_target:
+                self.reached_target += 1
+                ray.reached_target = True
                 break
+        # print(self.reached_target)
+        # print(f'reached: {ray.reached_target}, score: {ray.score()}')
     
     def draw(self, surface: Surface):
         for interactable in self.interactables:

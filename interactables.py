@@ -11,13 +11,15 @@ class Interactable(ABC):
     def __init__(
         self, vertices: list[Vector2],
         color: Color = colors.BLACK, closed: bool = False,
-        view_normals: bool = False
+        view_normals: bool = False,
+        is_target: bool = False
     ) -> None:
         self.vertices = vertices
         self.closed = closed
         self.color = color
         self.view_normals = view_normals
         self.max_interactions = 20
+        self.is_target = is_target
 
     def collide_with_segment(self, seg_index: int, ray: Ray) -> Vector2 | None:
         x1, y1 = ray.pos.xy
@@ -43,7 +45,7 @@ class Interactable(ABC):
             if tmp.magnitude() < collide_point.magnitude():
                 collide_point = tmp
                 seg_index = i
-        ray.set_collide_point(collide_point)
+        # ray.set_collide_point(collide_point)
         return collide_point, seg_index
 
     def get_normal(self, seg_index: int) -> Vector2:
@@ -86,9 +88,10 @@ class Reflector(Interactable):
         self, vertices: list[Vector2],
         color: Color = colors.BLACK,
         closed: bool = False,
-        view_normals: bool = False
+        view_normals: bool = False,
+        is_target: bool = False
     ) -> None:
-        super().__init__(vertices, color, closed, view_normals)
+        super().__init__(vertices, color, closed, view_normals, is_target)
 
     def interact_with_segment(self, ray: Ray, seg_index: int):
         collide_point = self.collide_with_segment(seg_index, ray)
@@ -105,8 +108,10 @@ class Absorber(Interactable):
             self,
             vertices: list[Vector2],
             color: Color = colors.BLACK, closed: bool = False,
-            view_normals: bool = False) -> None:
-        super().__init__(vertices, color, closed, view_normals)
+            view_normals: bool = False,
+            is_target: bool = False
+        ) -> None:
+        super().__init__(vertices, color, closed, view_normals, is_target)
 
     def interact_with_segment(self, ray: Ray, seg_index: int):
         collide_point = self.collide_with_segment(seg_index, ray)
